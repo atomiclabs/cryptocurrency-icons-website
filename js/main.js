@@ -34,7 +34,7 @@ $(document).ready(function() {
 		var icons = '';
 		var count = 0;
 
-		data.icons.forEach(function(icon) {
+		data.forEach(function(icon) {
 			// Get name
 			var name     = icon.name;
 			var nameAttr = name.split(' ').join('-').toLowerCase();
