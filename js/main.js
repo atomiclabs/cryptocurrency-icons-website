@@ -3,8 +3,8 @@ $(document).ready(function() {
   // ------------------------------
   // Settings
   // ------------------------------
-  var iconsBaseUrl = 'https://cdn.rawgit.com/atomiclabs/cryptocurrency-icons/master';
-  var dataJson     = 'https://cdn.rawgit.com/atomiclabs/cryptocurrency-icons/master/manifest.json';
+  var iconsBaseUrl = 'https://rawgit.com/atomiclabs/cryptocurrency-icons/master';
+  var dataJson     = 'https://rawgit.com/atomiclabs/cryptocurrency-icons/master/manifest.json';
   var formats      = ['svg', '128', '32', '32@2x'];
   var variants     = ['color', 'black', 'icon', 'white'];
   var iconDefault  = 'black';
