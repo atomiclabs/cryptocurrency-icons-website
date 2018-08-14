@@ -1,216 +1,185 @@
-$(document).ready(function() {
+$(document).ready(() => {
+	// ------------------------------
+	// Settings
+	// ------------------------------
+	const iconsBaseUrl = 'https://rawgit.com/atomiclabs/cryptocurrency-icons/master';
+	const dataJson = 'https://rawgit.com/atomiclabs/cryptocurrency-icons/master/manifest.json';
+	const formats = ['svg', '128', '32', '32@2x'];
+	const variants = ['color', 'black', 'icon', 'white'];
+	const iconDefault = 'black';
+	const iconHover = 'color';
 
-  // ------------------------------
-  // Settings
-  // ------------------------------
-  var iconsBaseUrl = 'https://rawgit.com/atomiclabs/cryptocurrency-icons/master';
-  var dataJson     = 'https://rawgit.com/atomiclabs/cryptocurrency-icons/master/manifest.json';
-  var formats      = ['svg', '128', '32', '32@2x'];
-  var variants     = ['color', 'black', 'icon', 'white'];
-  var iconDefault  = 'black';
-  var iconHover    = 'color';
+	// ------------------------------
+	// Init search
+	// ------------------------------
+	$('form .search').on('input', event => {
+		search($(event.currentTarget));
+	});
 
+	$('form').submit(event => {
+		event.preventDefault();
+		search($('form .search'));
+	});
 
-  // ------------------------------
-  // Init search
-  // ------------------------------
-  $('form .search').on('input', function() {
-    search($(this));
-  });
-
-  $('form').submit(function( event ) {
-    event.preventDefault();
-    search($('form .search'));
-  });
-
-
-  // ------------------------------
-  // Get icons
-  // ------------------------------
+	// ------------------------------
+	// Get icons
+	// ------------------------------
 
 	// Get icons in manifest
-	$.getJSON(dataJson, function(data) {
+	$.getJSON(dataJson, data => {
+		let icons = '';
+		let count = 0;
 
-		var icons = '';
-		var count = 0;
-
-		data.forEach(function(icon) {
+		for (const icon of data) {
 			// Get name
-			var name     = icon.name;
-			var nameAttr = name.split(' ').join('-').toLowerCase();
-			var symbol = icon.symbol.toLowerCase();
+			const name = icon.name;
+			const nameAttr = name.split(' ').join('-').toLowerCase();
+			const symbol = icon.symbol.toLowerCase();
 
 			// Avoid duplicates
 			if (icons.indexOf('data-icon="' + symbol + '"') === -1) {
-
 				// Construct icon
 				icons += '<div class="col-6 col-lg-4 col-xl-3 text-left icon">';
-				icons +=   '<a href="#' + symbol + '" class="bg-light d-block pt-4 pr-3 pb-4 pl-3" data-toggle="modal" data-target="#infoIcon" data-icon="' + symbol + '" data-name="' + nameAttr + '">';
-				icons +=     '<div class="row align-items-center">';
-				icons +=       '<div class="col container-img">';
-				icons +=         `<img class="mr-2" src="${iconsBaseUrl}/svg/` + iconDefault + '/' + symbol + '.svg" alt="' + symbol + '" onerror="error(this);">';
-				icons +=       '</div>';
-				icons +=       '<div class="col name text-dark">';
-				icons +=         name + '<span class="symbol text-muted text-uppercase small">' + symbol + '</span></div>';
-				icons +=       '</div>';
-				icons +=     '</div>';
-				icons +=   '</a>';
+				icons += '<a href="#' + symbol + '" class="bg-light d-block pt-4 pr-3 pb-4 pl-3" data-toggle="modal" data-target="#infoIcon" data-icon="' + symbol + '" data-name="' + nameAttr + '">';
+				icons += '<div class="row align-items-center">';
+				icons += '<div class="col container-img">';
+				icons += `<img class="mr-2" src="${iconsBaseUrl}/svg/` + iconDefault + '/' + symbol + '.svg" alt="' + symbol + '" onerror="error(this);">';
+				icons += '</div>';
+				icons += '<div class="col name text-dark">';
+				icons += name + '<span class="symbol text-muted text-uppercase small">' + symbol + '</span></div>';
+				icons += '</div>';
+				icons += '</div>';
+				icons += '</a>';
 				icons += '</div>';
 				count++;
-
 			}
-		});
+		}
 
 		// Display
 		$('.row.icons').html(icons);
 
 		// Hover
-		$('.icon').hover(function() {
-			changeFolder($(this), iconDefault, iconHover);
+		$('.icon').hover(event => {
+			changeFolder($(event.currentTarget), iconDefault, iconHover);
 		});
 
 		// Mouseleave
-		$('.icon').mouseleave(function() {
-			changeFolder($(this), iconHover, iconDefault );
+		$('.icon').mouseleave(event => {
+			changeFolder($(event.currentTarget), iconHover, iconDefault);
 		});
 
 		// Count icons
 		$('.count-cryptos').text(count);
-
 	});
 
-  // ------------------------------
-  // Functions
-  // ------------------------------
+	// ------------------------------
+	// Functions
+	// ------------------------------
 
-  // Search and Replace in Image src
-  // ------------------------------
-  function changeFolder(target, search, replace) {
+	// Search and Replace in Image src
+	function changeFolder(target, search, replace) {
+		target = $(target).find('img');
+		const srcInit = $(target).attr('src');
+		const srcAfter = srcInit.replace(search, replace);
+		$(target).attr('src', srcAfter);
+	}
 
-    var target   = $(target).find('img');
-    var srcInit  = $(target).attr('src');
-    var srcAfter = srcInit.replace(search, replace);
-    $(target).attr('src', srcAfter);
+	// Display icon info in Modal
+	$('#infoIcon').on('show.bs.modal', event => {
+		// Modal settings
+		const button = $(event.relatedTarget);
+		const modal = $(event.currentTarget);
+		const icon = button.data('icon');
 
-  }
+		// Table settings
+		let infos = '';
+		let i = 0;
+		let j = 0;
 
-  // Display icon info in Modal
-  // ------------------------------
-  $('#infoIcon').on('show.bs.modal', function (event) {
+		// Construct table
+		infos += '<table class="table info-icon mb-0">';
 
-    // Modal settings
-    var button = $(event.relatedTarget);
-    var modal  = $(this);
-    var icon   = button.data('icon');
+		// Construct titles
+		infos += '<thead>';
+		infos += '<tr>';
+		infos += '<th class="text-center text-uppercase align-middle"><h5 class="mb-0">' + icon + '</h5></th>';
+		while (variants[j]) {
+			var formatCss = formats[i].replace('@', '-');
+			infos += '<th class="variant-' + variants[j] + ' text-center font-weight-light text-muted align-middle">' + variants[j] + '</th>';
+			j++;
+		}
 
-    // Table settings
-    var infos = '';
-    var i = 0;
-    var j = 0;
+		j = 0;
+		infos += '</tr>';
+		infos += '</thead>';
+		infos += '<tbody>';
 
-    // Construct table
-    infos += '<table class="table info-icon mb-0">';
+		// Construct Row
+		while (formats[i]) {
+			var formatCss = formats[i].replace('@', '-');
+			infos += '<tr>';
 
-    // Construct titles
-    infos +=   '<thead>';
-    infos +=     '<tr>';
-    infos +=       '<th class="text-center text-uppercase align-middle"><h5 class="mb-0">' + icon + '</h5></th>';
-    while (variants[j]) {
+			// Construct titles of row
+			infos += '<th class="format-' + formatCss + ' text-center font-weight-light text-muted align-middle" scope="row">' + formats[i] + '</th>';
 
-      var formatCss = formats[i].replace('@', '-');
-      infos +=       '<th class="variant-' + variants[j] + ' text-center font-weight-light text-muted align-middle">' + variants[j] + '</th>';
-      j++;
+			// File extension
+			if (formats[i] == 'svg') {
+				var extension = '.svg';
+			} else if (formats[i] == '32@2x') {
+				var extension = '@2x.png';
+			} else {
+				var extension = '.png';
+			}
 
-    }
+			// Construct icons cells
+			while (variants[j]) {
+				infos += '<td class="format-' + formatCss + ' variant-' + variants[j] + ' text-center">';
+				infos += `<img src="${iconsBaseUrl}/` + formats[i] + '/' + variants[j] + '/' + icon + extension + '" alt="' + icon + '">';
+				infos += '</td>';
+				j++;
+			}
 
-    j = 0;
-    infos +=     '</tr>';
-    infos +=   '</thead>';
-    infos +=   '<tbody>';
+			j = 0;
+			i++;
+			infos += '</tr>';
+		}
 
-    // Construct Row
-    while (formats[i]) {
+		// Close table
+		infos += '</tbody>';
+		infos += '</table>';
 
-      var formatCss = formats[i].replace('@', '-');
-      infos +=     '<tr>';
+		// Display
+		modal.find('.modal-title').text(icon);
+		modal.find('.modal-body').html(infos);
+	});
 
-      // Construct titles of row
-      infos +=       '<th class="format-' + formatCss + ' text-center font-weight-light text-muted align-middle" scope="row">' + formats[i] + '</th>';
+	// Search
+	function search(target) {
+		if ($(target).val().length > 0) {
+			// Filter icons
+			$('.icon').css('display', 'none');
+			$(`a[data-icon*="${$(target).val().toLowerCase()}"]`).parent().css('display', 'block');
+			$(`a[data-name*="${$(target).val().toLowerCase()}"]`).parent().css('display', 'block');
 
-      // File extension
-      if (formats[i] == 'svg') {
-        var extension = '.svg';
-      }
-      else if (formats[i] == '32@2x') {
-        var extension = '@2x.png';
-      }
-      else {
-        var extension = '.png';
-      }
+			// Close
+			$('<div class="close-search"></div>').insertAfter(target);
+			$('.close-search').click(() => {
+				closeSearch(target);
+			});
+		} else {
+			closeSearch(target);
+		}
+	}
 
-      // Construct icons cells
-      while (variants[j]) {
-
-        infos +=       '<td class="format-' + formatCss + ' variant-' + variants[j] + ' text-center">';
-        infos +=         `<img src="${iconsBaseUrl}/` + formats[i] + '/' + variants[j] + '/' + icon + extension + '" alt="' + icon + '">';
-        infos +=       '</td>';
-        j++;
-
-      }
-
-      j = 0;
-      i++;
-      infos +=     '</tr>';
-
-    }
-
-    // Close table
-    infos +=   '</tbody>';
-    infos += '</table>';
-
-    // Display
-    modal.find('.modal-title').text(icon);
-    modal.find('.modal-body').html(infos);
-
-  });
-
-  // Search
-  // ------------------------------
-  function search(target) {
-
-    if ($(target).val().length > 0) {
-
-      // Filter icons
-      $('.icon').css('display', 'none');
-      $('a[data-icon*="' + $(target).val().toLowerCase() + '"]').parent().css('display', 'block');
-      $('a[data-name*="' + $(target).val().toLowerCase() + '"]').parent().css('display', 'block');
-
-      // Close
-      $('<div class="close-search"></div>').insertAfter(target);
-      $('.close-search').click(function() {
-        closeSearch(target);
-      });
-
-    }
-    else {
-      closeSearch(target);
-    }
-
-  }
-
-  // Close search
-  // ------------------------------
-  function closeSearch(target) {
-    $('.close-search').remove();
-    $('.icon').css('display', 'block');
-    $(target).val('');
-  }
-
+	// Close search
+	function closeSearch(target) {
+		$('.close-search').remove();
+		$('.icon').css('display', 'block');
+		$(target).val('');
+	}
 });
 
-
 // Hide icons on error
-// ------------------------------
 function error(img) {
-  $(img).parentsUntil('.icon').parent().remove();
+	$(img).parentsUntil('.icon').parent().remove();
 }
