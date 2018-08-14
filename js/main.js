@@ -3,9 +3,8 @@ $(document).ready(function() {
   // ------------------------------
   // Settings
   // ------------------------------
-  var apiUrl       = 'https://api.coinmarketcap.com/v1/ticker/?limit=0';
   var iconsBaseUrl = 'https://rawgit.com/atomiclabs/cryptocurrency-icons/master';
-  var dataJson     = 'https://raw.githubusercontent.com/atomiclabs/cryptocurrency-icons/master/manifest.json';
+  var dataJson     = 'https://rawgit.com/atomiclabs/cryptocurrency-icons/master/manifest.json';
   var formats      = ['svg', '128', '32', '32@2x'];
   var variants     = ['color', 'black', 'icon', 'white'];
   var iconDefault  = 'black';
@@ -29,67 +28,55 @@ $(document).ready(function() {
   // Get icons
   // ------------------------------
 
-  // Get icons from CoinMarketCap
-  $.getJSON(apiUrl, function(coins){
+	// Get icons in manifest
+	$.getJSON(dataJson, function(data) {
 
-    // Get icons in manifest
-    $.getJSON(dataJson, function(data) {
+		var icons = '';
+		var count = 0;
 
-      var icons = '';
-      var count = 0;
+		data.forEach(function(icon) {
+			// Get name
+			var name     = icon.name;
+			var nameAttr = name.split(' ').join('-').toLowerCase();
 
-      data.icons.forEach(function(icon) {
+			// Avoid duplicates
+			if (icons.indexOf('data-icon="' + icon.symbol + '"') === -1) {
 
-        // Get symbol
-        var coin = coins.find(function(coin){
-          return coin.symbol.toLowerCase() === icon;
-        })
+				// Construct icon
+				icons += '<div class="col-6 col-lg-4 col-xl-3 text-left icon">';
+				icons +=   '<a href="#' + icon.symbol + '" class="bg-light d-block pt-4 pr-3 pb-4 pl-3" data-toggle="modal" data-target="#infoIcon" data-icon="' + icon.symbol + '" data-name="' + nameAttr + '">';
+				icons +=     '<div class="row align-items-center">';
+				icons +=       '<div class="col container-img">';
+				icons +=         `<img class="mr-2" src="${iconsBaseUrl}/svg/` + iconDefault + '/' + icon.symbol + '.svg" alt="' + icon.symbol + '" onerror="error(this);">';
+				icons +=       '</div>';
+				icons +=       '<div class="col name text-dark">';
+				icons +=         name + '<span class="symbol text-muted text-uppercase small">' + icon.symbol + '</span></div>';
+				icons +=       '</div>';
+				icons +=     '</div>';
+				icons +=   '</a>';
+				icons += '</div>';
+				count++;
 
-        // Get name
-        var name     = coin ? coin.name : icon;
-        var nameAttr = name.split(' ').join('-').toLowerCase();
+			}
+		});
 
+		// Display
+		$('.row.icons').html(icons);
 
-        // Avoid duplicates
-        if (icons.indexOf('data-icon="' + icon + '"') === -1) {
+		// Hover
+		$('.icon').hover(function() {
+			changeFolder($(this), iconDefault, iconHover);
+		});
 
-          // Construct icon
-          icons += '<div class="col-6 col-lg-4 col-xl-3 text-left icon">';
-          icons +=   '<a href="#' + icon + '" class="bg-light d-block pt-4 pr-3 pb-4 pl-3" data-toggle="modal" data-target="#infoIcon" data-icon="' + icon + '" data-name="' + nameAttr + '">';
-          icons +=     '<div class="row align-items-center">';
-          icons +=       '<div class="col container-img">';
-          icons +=         `<img class="mr-2" src="${iconsBaseUrl}/svg/` + iconDefault + '/' + icon + '.svg" alt="' + icon + '" onerror="error(this);">';
-          icons +=       '</div>';
-          icons +=       '<div class="col name text-dark">';
-          icons +=         name + '<span class="symbol text-muted text-uppercase small">' + icon + '</span></div>';
-          icons +=       '</div>';
-          icons +=     '</div>';
-          icons +=   '</a>';
-          icons += '</div>';
-          count++;
+		// Mouseleave
+		$('.icon').mouseleave(function() {
+			changeFolder($(this), iconHover, iconDefault );
+		});
 
-        }
-      });
+		// Count icons
+		$('.count-cryptos').text(count);
 
-      // Display
-      $('.row.icons').html(icons);
-
-      // Hover
-      $('.icon').hover(function() {
-        changeFolder($(this), iconDefault, iconHover);
-      });
-
-      // Mouseleave
-      $('.icon').mouseleave(function() {
-        changeFolder($(this), iconHover, iconDefault );
-      });
-
-      // Count icons
-      $('.count-cryptos').text(count);
-
-    });
-  });
-
+	});
 
   // ------------------------------
   // Functions
