@@ -38,19 +38,20 @@ $(document).ready(function() {
 			// Get name
 			var name     = icon.name;
 			var nameAttr = name.split(' ').join('-').toLowerCase();
+			var symbol = icon.symbol.toLowerCase();
 
 			// Avoid duplicates
-			if (icons.indexOf('data-icon="' + icon.symbol + '"') === -1) {
+			if (icons.indexOf('data-icon="' + symbol + '"') === -1) {
 
 				// Construct icon
 				icons += '<div class="col-6 col-lg-4 col-xl-3 text-left icon">';
-				icons +=   '<a href="#' + icon.symbol + '" class="bg-light d-block pt-4 pr-3 pb-4 pl-3" data-toggle="modal" data-target="#infoIcon" data-icon="' + icon.symbol + '" data-name="' + nameAttr + '">';
+				icons +=   '<a href="#' + symbol + '" class="bg-light d-block pt-4 pr-3 pb-4 pl-3" data-toggle="modal" data-target="#infoIcon" data-icon="' + symbol + '" data-name="' + nameAttr + '">';
 				icons +=     '<div class="row align-items-center">';
 				icons +=       '<div class="col container-img">';
-				icons +=         `<img class="mr-2" src="${iconsBaseUrl}/svg/` + iconDefault + '/' + icon.symbol + '.svg" alt="' + icon.symbol + '" onerror="error(this);">';
+				icons +=         `<img class="mr-2" src="${iconsBaseUrl}/svg/` + iconDefault + '/' + symbol + '.svg" alt="' + symbol + '" onerror="error(this);">';
 				icons +=       '</div>';
 				icons +=       '<div class="col name text-dark">';
-				icons +=         name + '<span class="symbol text-muted text-uppercase small">' + icon.symbol + '</span></div>';
+				icons +=         name + '<span class="symbol text-muted text-uppercase small">' + symbol + '</span></div>';
 				icons +=       '</div>';
 				icons +=     '</div>';
 				icons +=   '</a>';
