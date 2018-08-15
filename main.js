@@ -15,7 +15,7 @@ $('form .search').on('input', event => {
 	search($(event.currentTarget));
 });
 
-$('form').submit(event => {
+$('form').on('submit', event => {
 	event.preventDefault();
 	search($('form .search'));
 });
@@ -23,49 +23,44 @@ $('form').submit(event => {
 // ------------------------------
 // Get icons
 // ------------------------------
-
-// Get icons in manifest
 (async () => {
 	const response = await fetch(dataJson);
-	const data = await response.json();
+	const icons = await response.json();
 
-	// Count icons
-	$('.count-cryptos').text(data.length);
+	$('.count-cryptos').text(icons.length);
 
-	let icons = '';
-	for (const icon of data) {
+	let html = '';
+	for (const icon of icons) {
 		// Get name
 		const {name} = icon;
-		const nameAttr = name.split(' ').join('-').toLowerCase();
+		const nameDataAttribute = name.split(' ').join('-').toLowerCase();
 		const symbol = icon.symbol.toLowerCase();
+		const imageUrl = `${iconsBaseUrl}/svg/${iconDefault}/${symbol}.svg`;
 
 		// Construct icon
-		icons += '<div class="col-6 col-lg-4 col-xl-3 text-left icon">';
-		icons += '<a href="#' + symbol + '" class="bg-light d-block pt-4 pr-3 pb-4 pl-3" data-toggle="modal" data-target="#infoIcon" data-icon="' + symbol + '" data-name="' + nameAttr + '">';
-		icons += '<div class="row align-items-center">';
-		icons += '<div class="col container-img">';
-		icons += `<img class="mr-2" src="${iconsBaseUrl}/svg/` + iconDefault + '/' + symbol + '.svg" alt="' + symbol + '" onerror="iconLoadError(this)">';
-		icons += '</div>';
-		icons += '<div class="col name text-dark">';
-		icons += name + '<span class="symbol text-muted text-uppercase small">' + symbol + '</span></div>';
-		icons += '</div>';
-		icons += '</div>';
-		icons += '</a>';
-		icons += '</div>';
+		html += `
+			<div class="col-6 col-lg-4 col-xl-3 text-left icon">
+				<a href="#${symbol}" class="bg-light d-block pt-4 pr-3 pb-4 pl-3" data-toggle="modal" data-target="#infoIcon" data-icon="${symbol}" data-name="${nameDataAttribute}">
+					<div class="row align-items-center">
+						<div class="col container-img">
+							<img class="mr-2" src="${imageUrl}" alt="${symbol}" onerror="iconLoadError(this)">
+						</div>
+						<div class="col name text-dark">${name}<span class="symbol text-muted text-uppercase small">${symbol}</span></div>
+					</div>
+				</a>
+			</div>
+		`;
 	}
 
-	// Display
-	$('.row.icons').html(icons);
+	$('.row.icons').html(html);
 
-	// Hover
-	$('.icon').hover(event => {
-		changeFolder($(event.currentTarget), iconDefault, iconHover);
-	});
-
-	// Mouseleave
-	$('.icon').mouseleave(event => {
-		changeFolder($(event.currentTarget), iconHover, iconDefault);
-	});
+	$('.icon')
+		.on('mouseover', event => {
+			changeFolder($(event.currentTarget), iconDefault, iconHover);
+		})
+		.on('mouseleave', event => {
+			changeFolder($(event.currentTarget), iconHover, iconDefault);
+		});
 })();
 
 // ------------------------------
@@ -101,10 +96,10 @@ $('#infoIcon').on('show.bs.modal', event => {
 	// Construct titles
 	infos += '<thead>';
 	infos += '<tr>';
-	infos += '<th class="text-center text-uppercase align-middle"><h5 class="mb-0">' + icon + '</h5></th>';
+	infos += `<th class="text-center text-uppercase align-middle"><h5 class="mb-0">${icon}</h5></th>`;
 	while (variants[j]) {
 		formatCss = formats[i].replace('@', '-');
-		infos += '<th class="variant-' + variants[j] + ' text-center font-weight-light text-muted align-middle">' + variants[j] + '</th>';
+		infos += `<th class="variant-${variants[j]} text-center font-weight-light text-muted align-middle">${variants[j]}</th>`;
 		j++;
 	}
 
@@ -119,7 +114,7 @@ $('#infoIcon').on('show.bs.modal', event => {
 		infos += '<tr>';
 
 		// Construct titles of row
-		infos += '<th class="format-' + formatCss + ' text-center font-weight-light text-muted align-middle" scope="row">' + formats[i] + '</th>';
+		infos += `<th class="format-${formatCss} text-center font-weight-light text-muted align-middle" scope="row">${formats[i]}</th>`;
 
 		// File extension
 		if (formats[i] === 'svg') {
@@ -132,8 +127,8 @@ $('#infoIcon').on('show.bs.modal', event => {
 
 		// Construct icons cells
 		while (variants[j]) {
-			infos += '<td class="format-' + formatCss + ' variant-' + variants[j] + ' text-center">';
-			infos += `<img src="${iconsBaseUrl}/` + formats[i] + '/' + variants[j] + '/' + icon + extension + '" alt="' + icon + '">';
+			infos += `<td class="format-${formatCss} variant-${variants[j]} text-center">`;
+			infos += `<img src="${iconsBaseUrl}/${formats[i]}/${variants[j]}/${icon}${extension}" alt="${icon}">`;
 			infos += '</td>';
 			j++;
 		}
@@ -157,12 +152,13 @@ function search(target) {
 	if ($(target).val().length > 0) {
 		// Filter icons
 		$('.icon').css('display', 'none');
-		$(`a[data-icon*="${$(target).val().toLowerCase()}"]`).parent().css('display', 'block');
-		$(`a[data-name*="${$(target).val().toLowerCase()}"]`).parent().css('display', 'block');
+		const searchQuery = $(target).val().toLowerCase();
+		$(`a[data-icon*="${searchQuery}"]`).parent().css('display', 'block');
+		$(`a[data-name*="${searchQuery}"]`).parent().css('display', 'block');
 
 		// Close
 		$('<div class="close-search"></div>').insertAfter(target);
-		$('.close-search').click(() => {
+		$('.close-search').on('click', () => {
 			closeSearch(target);
 		});
 	} else {
