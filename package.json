@@ -8,6 +8,9 @@
 	"xo": {
 		"envs": [
 			"browser"
+		],
+		"globals": [
+			"$"
 		]
 	}
 }
