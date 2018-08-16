@@ -8,6 +8,29 @@ const variants = ['color', 'black', 'icon', 'white'];
 const iconDefault = 'black';
 const iconHover = 'color';
 
+const preloadImages = (...urls) => {
+	for (const url of urls) {
+		const image = new Image();
+		image.src = url;
+	}
+}
+
+// Get the URLs for all the icon variant for a symbol
+const imageUrlsForSymbol = symbol => {
+	const urls = [];
+
+	for (const format of formats) {
+		const filename = format === '32@2x' ? `${symbol}@2x` : symbol;
+		const extension = format === 'svg' ? 'svg' : 'png';
+
+		for (const variant of variants) {
+			urls.push(`${iconsBaseUrl}/${format}/${variant}/${filename}.${extension}`);
+		}
+	}
+
+	return urls;
+};
+
 // ------------------------------
 // Init search
 // ------------------------------
@@ -31,7 +54,6 @@ $('form').on('submit', event => {
 
 	let html = '';
 	for (const icon of icons) {
-		// Get name
 		const {name} = icon;
 		const nameDataAttribute = name.split(' ').join('-').toLowerCase();
 		const symbol = icon.symbol.toLowerCase();
@@ -50,6 +72,8 @@ $('form').on('submit', event => {
 				</a>
 			</div>
 		`;
+
+		preloadImages(`${iconsBaseUrl}/svg/${iconHover}/${symbol}.svg`);
 	}
 
 	$('.row.icons').html(html);
@@ -57,6 +81,9 @@ $('form').on('submit', event => {
 	$('.icon')
 		.on('mouseover', event => {
 			changeFolder($(event.currentTarget), iconDefault, iconHover);
+
+			const symbol = $('a', event.currentTarget).data('icon');
+			preloadImages(...imageUrlsForSymbol(symbol));
 		})
 		.on('mouseleave', event => {
 			changeFolder($(event.currentTarget), iconHover, iconDefault);
