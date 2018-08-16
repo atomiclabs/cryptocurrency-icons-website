@@ -1,8 +1,11 @@
 {
 	"scripts": {
-		"test": "xo"
+		"lint": "xo && stylelint --fix '*.css'",
+		"test": "npm run lint"
 	},
 	"devDependencies": {
+		"stylelint": "^9.4.0",
+		"stylelint-config-xo": "^0.10.0",
 		"xo": "^0.22.0"
 	},
 	"xo": {
@@ -12,5 +15,12 @@
 		"globals": [
 			"$"
 		]
+	},
+	"stylelint": {
+		"extends": "stylelint-config-xo",
+		"rules": {
+			"property-blacklist": null,
+			"declaration-no-important": null
+		}
 	}
 }
