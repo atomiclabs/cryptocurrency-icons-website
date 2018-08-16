@@ -13,7 +13,7 @@ const preloadImages = (...urls) => {
 		const image = new Image();
 		image.src = url;
 	}
-}
+};
 
 // Get the URLs for all the icon variant for a symbol
 const imageUrlsForSymbol = symbol => {
@@ -31,21 +31,59 @@ const imageUrlsForSymbol = symbol => {
 	return urls;
 };
 
-// ------------------------------
+// Search and replace in image src
+const changeFolder = (target, search, replace) => {
+	target = $(target).find('img');
+	const srcInit = $(target).attr('src');
+	const srcAfter = srcInit.replace(search, replace);
+	$(target).attr('src', srcAfter);
+};
+
+const closeSearch = target => {
+	$('.close-search').remove();
+	$('.icon').css('display', 'block');
+	$(target).val('');
+};
+
+const search = target => {
+	if ($(target).val().length > 0) {
+		// Filter icons
+		$('.icon').css('display', 'none');
+		const searchQuery = $(target).val().toLowerCase();
+		$(`a[data-icon*="${searchQuery}"]`).parent().css('display', 'block');
+		$(`a[data-name*="${searchQuery}"]`).parent().css('display', 'block');
+
+		// Close
+		$('<div class="close-search"></div>').insertAfter(target);
+		$('.close-search').on('click', () => {
+			closeSearch(target);
+		});
+	} else {
+		closeSearch(target);
+	}
+};
+
+// Hide icons on error
+window.iconLoadError = image => {
+	$(image).parentsUntil('.icon').parent().remove();
+};
+
 // Init search
-// ------------------------------
-$('form .search').on('input', event => {
-	search($(event.currentTarget));
-});
+$('form .search')
+	.on('input', event => {
+		search($(event.currentTarget));
+	})
+	.on('keyup', event => {
+		if (event.key === 'Escape') {
+			closeSearch($(event.currentTarget));
+		}
+	});
 
 $('form').on('submit', event => {
 	event.preventDefault();
-	search($('form .search'));
 });
 
-// ------------------------------
 // Get icons
-// ------------------------------
 (async () => {
 	const response = await fetch(dataJson);
 	const icons = await response.json();
@@ -89,18 +127,6 @@ $('form').on('submit', event => {
 			changeFolder($(event.currentTarget), iconHover, iconDefault);
 		});
 })();
-
-// ------------------------------
-// Functions
-// ------------------------------
-
-// Search and replace in image src
-function changeFolder(target, search, replace) {
-	target = $(target).find('img');
-	const srcInit = $(target).attr('src');
-	const srcAfter = srcInit.replace(search, replace);
-	$(target).attr('src', srcAfter);
-}
 
 // Display icon info in a modal
 $('#infoIcon').on('show.bs.modal', event => {
@@ -173,34 +199,3 @@ $('#infoIcon').on('show.bs.modal', event => {
 	modal.find('.modal-title').text(icon);
 	modal.find('.modal-body').html(infos);
 });
-
-// Search
-function search(target) {
-	if ($(target).val().length > 0) {
-		// Filter icons
-		$('.icon').css('display', 'none');
-		const searchQuery = $(target).val().toLowerCase();
-		$(`a[data-icon*="${searchQuery}"]`).parent().css('display', 'block');
-		$(`a[data-name*="${searchQuery}"]`).parent().css('display', 'block');
-
-		// Close
-		$('<div class="close-search"></div>').insertAfter(target);
-		$('.close-search').on('click', () => {
-			closeSearch(target);
-		});
-	} else {
-		closeSearch(target);
-	}
-}
-
-// Close search
-function closeSearch(target) {
-	$('.close-search').remove();
-	$('.icon').css('display', 'block');
-	$(target).val('');
-}
-
-// Hide icons on error
-window.iconLoadError = image => {
-	$(image).parentsUntil('.icon').parent().remove();
-};
