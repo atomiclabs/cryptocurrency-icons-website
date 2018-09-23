@@ -1,8 +1,8 @@
 // ------------------------------
 // Settings
 // ------------------------------
-const iconsBaseUrl = 'https://rawgit.com/atomiclabs/cryptocurrency-icons/master';
-const dataJson = 'https://rawgit.com/atomiclabs/cryptocurrency-icons/master/manifest.json';
+const iconsBaseUrl = 'https://cdn.rawgit.com/atomiclabs/cryptocurrency-icons/master';
+const dataJson = 'https://cdn.rawgit.com/atomiclabs/cryptocurrency-icons/master/manifest.json';
 const formats = ['svg', '128', '32', '32@2x'];
 const variants = ['color', 'black', 'icon', 'white'];
 const iconDefault = 'black';
