@@ -1,8 +1,8 @@
 // ------------------------------
 // Settings
 // ------------------------------
-const iconsBaseUrl = 'https://cdn.rawgit.com/atomiclabs/cryptocurrency-icons/master';
-const dataJson = 'https://cdn.rawgit.com/atomiclabs/cryptocurrency-icons/master/manifest.json';
+let iconsBaseUrl = 'https://cdn.jsdelivr.net/gh/atomiclabs/cryptocurrency-icons';
+const githubUrl = 'https://api.github.com/repos/atomiclabs/cryptocurrency-icons/commits';
 const formats = ['svg', '128', '32', '32@2x'];
 const variants = ['color', 'black', 'icon', 'white'];
 const iconDefault = 'black';
@@ -85,6 +85,12 @@ $('form').on('submit', event => {
 
 // Get icons
 (async () => {
+	const commitsResponse = await fetch(githubUrl);
+	const [commit] = await commitsResponse.json();
+
+	iconsBaseUrl += '@' + commit.sha;
+
+	const dataJson = iconsBaseUrl + '/manifest.json';
 	const response = await fetch(dataJson);
 	const icons = await response.json();
 
