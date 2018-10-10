@@ -41,17 +41,25 @@ const changeFolder = (target, search, replace) => {
 
 const closeSearch = target => {
 	$('.close-search').remove();
-	$('.icon').css('display', 'block');
+	$('.icon')
+		.removeClass('d-none')
+		.addClass('d-block');
 	$(target).val('');
 };
 
 const search = target => {
 	if ($(target).val().length > 0) {
 		// Filter icons
-		$('.icon').css('display', 'none');
+		$('.icon')
+			.removeClass('d-block')
+			.addClass('d-none');
 		const searchQuery = $(target).val().toLowerCase();
-		$(`a[data-icon*="${searchQuery}"]`).parent().css('display', 'block');
-		$(`a[data-name*="${searchQuery}"]`).parent().css('display', 'block');
+		$(`a[data-icon*="${searchQuery}"]`).parent()
+			.removeClass('d-none')
+			.addClass('d-block');
+		$(`a[data-name*="${searchQuery}"]`).parent()
+			.removeClass('d-none')
+			.addClass('d-block');
 
 		// Close
 		$('<div class="close-search"></div>').insertAfter(target);
